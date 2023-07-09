@@ -7,6 +7,7 @@
 #
 #
 #
+#
 
 import requests
 import json
@@ -21,15 +22,15 @@ url = "https://api.monsterapi.ai/apis/add-task"
 payload = json.dumps({
     "model": "txt2img",
     "data": {
-        "prompt": "3d image of different frequency operations between self",  # theory where is no such effect like
+        "prompt": "image of different frequency operations around",  # theory where is no such effect like
         "negprompt": "lowres, worst quality, low quality, jpeg artifacts",
         # "negprompt": "lowres, signs, memes, labels, text, food, text, error, mutant, cropped, worst quality, low quality, normal " \
         #             "quality, jpeg artifacts, signature, watermark, username, blurry, made by children, caricature, ugly, boring, sketch, lacklustre, repetitive, cropped, (long neck), facebook, youtube, body horror, out of frame, mutilated, tiled, frame, border, porcelain skin, doll like, doll, bad quality, cartoon, lowres, meme, low quality, worst quality, ugly, disfigured, inhuman",
         "samples": 1,
-        "steps": 50,
+        "steps": 450,  # 30-500
         "aspect_ratio": "landscape",
-        "guidance_scale": 12.5,
-        "seed": random.randint(1, 9999999999999998887773999)
+        "guidance_scale": 5,  # 5-50,
+        "seed": random.randint(1, 99699999999997)
     }
 })
 
