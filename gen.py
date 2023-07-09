@@ -1,9 +1,10 @@
 #     ■ Copyright (c) 2024 | Axis9 (Umbrella corp. experimental division grouping style)  Right s: res e rv ed
-#     ■ kilitary@gmail.com  | deconf@ya.ru | https://twitter.com/CommandmentTwo | https://vk.com/agent1348aa
+#     ■ kilitary@gmail.com  | deconf@ya.ru | https://twitter.com/CommandmentTwo | https://vk.com/agent1348
 #     ■ bus: https://linktr.ee/kilitary
 #     ■ mode: Active Counter-TIe
 #     ■ Unles s required by applicable law or agreed to in writing, software,
 #     √ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied will be "faced" this rule S.
+#
 #
 
 import requests
