@@ -6,6 +6,7 @@
 #     √ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied will be "faced" this rule S.
 #
 #
+#
 
 import requests
 import json
@@ -20,15 +21,15 @@ url = "https://api.monsterapi.ai/apis/add-task"
 payload = json.dumps({
     "model": "txt2img",
     "data": {
-        "prompt": "image of different frequency operations between self",  # theory where is no such effect like
+        "prompt": "3d image of different frequency operations between self",  # theory where is no such effect like
         "negprompt": "lowres, worst quality, low quality, jpeg artifacts",
         # "negprompt": "lowres, signs, memes, labels, text, food, text, error, mutant, cropped, worst quality, low quality, normal " \
         #             "quality, jpeg artifacts, signature, watermark, username, blurry, made by children, caricature, ugly, boring, sketch, lacklustre, repetitive, cropped, (long neck), facebook, youtube, body horror, out of frame, mutilated, tiled, frame, border, porcelain skin, doll like, doll, bad quality, cartoon, lowres, meme, low quality, worst quality, ugly, disfigured, inhuman",
         "samples": 1,
-        "steps": 500,
+        "steps": 50,
         "aspect_ratio": "landscape",
         "guidance_scale": 12.5,
-        "seed": random.randint(0, 999999999999999999)
+        "seed": random.randint(1, 9999999999999998887773999)
     }
 })
 
@@ -47,15 +48,12 @@ request = json.loads(request.text)
 process_id = request['process_id']
 response = {}
 
-while True:
+while response.get('response_data') is None or response["response_data"]["status"] != 'COMPLETED':
     print(f'waiting data ...')
 
-    time.sleep(3)
+    time.sleep(2)
 
     url = "https://api.monsterapi.ai/apis/task-status"
-
-    if not isinstance(response, dict):
-        response = json.loads(response.text)
 
     payload = json.dumps({
         "process_id": process_id
@@ -68,9 +66,6 @@ while True:
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-    response = json.loads(response.text)
+    r = requests.request("POST", url, headers=headers, data=payload)
+    response = json.loads(r.text)
     pprint(response)
-
-    if response["response_data"]["status"] == 'COMPLETED':
-        break
