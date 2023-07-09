@@ -1,5 +1,5 @@
 #     ■ Copyright (c) 2024 | Axis9 (Umbrella corp. experimental division grouping style)  Right s: res e rv ed
-#     ■ kilitary@gmail.com  | deconf@ya.ru | https://twitter.com/CommandmentTwo | https://vk.com/agent1348
+#     ■ kilitary@gmail.com  | deconf@ya.ru | https://twitter.com/CommandmentTwo | https://vk.com/agent1348aa
 #     ■ bus: https://linktr.ee/kilitary
 #     ■ mode: Active Counter-TIe
 #     ■ Unles s required by applicable law or agreed to in writing, software,
@@ -24,10 +24,10 @@ payload = json.dumps({
         # "negprompt": "lowres, signs, memes, labels, text, food, text, error, mutant, cropped, worst quality, low quality, normal " \
         #             "quality, jpeg artifacts, signature, watermark, username, blurry, made by children, caricature, ugly, boring, sketch, lacklustre, repetitive, cropped, (long neck), facebook, youtube, body horror, out of frame, mutilated, tiled, frame, border, porcelain skin, doll like, doll, bad quality, cartoon, lowres, meme, low quality, worst quality, ugly, disfigured, inhuman",
         "samples": 1,
-        "steps": 50,
+        "steps": 500,
         "aspect_ratio": "landscape",
         "guidance_scale": 12.5,
-        "seed": random.randint(0, 99999999)
+        "seed": random.randint(0, 999999999999999999)
     }
 })
 
@@ -38,26 +38,38 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+request = requests.request("POST", url, headers=headers, data=payload)
 
-print(response.text)
+print(request.text)
+request = json.loads(request.text)
 
-print(f'waiting to data ...')
+process_id = request['process_id']
+response = {}
 
-time.sleep(20)
-url = "https://api.monsterapi.ai/apis/task-status"
+while True:
+    print(f'waiting data ...')
 
-response = json.loads(response.text)
-pprint(response)
-payload = json.dumps({
-    "process_id": response['process_id']
-})
-headers = {
-    'x-api-key': 'pZJENJoUJi9CoHBFJ6di93Ay1LS5eZhr3dWtB5Km',
-    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0NDc2OTMsImlhdCI6MTY4ODg1NTY5"
-                     "Mywic3ViIjoiZmViNTVhMmQ0NmY2MWRlMzE5NzQ3NGI3NTcwZWM2YTMifQ.wWse12KVmq2yONKj5a5dEYmg7ApwHBi86ZVvzTmU4PE",
-    'Content-Type': 'application/json'
-}
+    time.sleep(3)
 
-response = requests.request("POST", url, headers=headers, data=payload)
-print(response.text)
+    url = "https://api.monsterapi.ai/apis/task-status"
+
+    if not isinstance(response, dict):
+        response = json.loads(response.text)
+
+    payload = json.dumps({
+        "process_id": process_id
+    })
+
+    headers = {
+        'x-api-key': 'pZJENJoUJi9CoHBFJ6di93Ay1LS5eZhr3dWtB5Km',
+        'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0NDc2OTMsImlhdCI6MTY4ODg1NTY5"
+                         "Mywic3ViIjoiZmViNTVhMmQ0NmY2MWRlMzE5NzQ3NGI3NTcwZWM2YTMifQ.wWse12KVmq2yONKj5a5dEYmg7ApwHBi86ZVvzTmU4PE",
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    response = json.loads(response.text)
+    pprint(response)
+
+    if response["response_data"]["status"] == 'COMPLETED':
+        break
