@@ -1,3 +1,5 @@
+#  Copyright (c) 2024 | Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
+#
 import requests
 from pprint import pprint
 import time
@@ -14,8 +16,8 @@ for token in tokens:
         "model": "falcon-7b-instruct",
         "data": {
             "prompt": f"info about {token}",
-            "top_k": 6,  # 0-10
-            "top_p": 0.1  # 0-1
+            "top_k": 1,  # 0-10
+            "top_p": 0.4  # 0-1
         }
     }
     headers = {
