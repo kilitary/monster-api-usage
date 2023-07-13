@@ -2,24 +2,28 @@
 #
 #
 
-import requests
-import json
-import random
 import os
-import sys
 import time
 from pprint import pprint
+
+import requests
+
+pid = os.getpid()
+print(f'seed: {pid}')
+
+prompt = "massive black hole located near another dissapeared black hole with high entropy low vacuum field, no self in, high quality image"
+print(f'prompt: {prompt}')
 
 payload = {
     "model": "txt2img",
     "data": {
-        "prompt":"multiple  unstable wires near massive black hole , only three objects loading and no  out or waves around  from self",
+        "prompt": prompt,
         "negprompt": "lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll",
         "samples": 1,
-        "steps": 500,
+        "steps": 113,
         "aspect_ratio": "portrait",
-        "guidance_scale": 32.5,
-        "seed": os.getpid()
+        "guidance_scale": 31.5,
+        "seed": pid
     }
 }
 
@@ -31,18 +35,21 @@ headers = {
 }
 
 url = "https://api.monsterapi.ai/apis/add-task"
-request = requests.post(url, headers=headers, json=payload)
-print(request.text)
-request = request.json()
-process_id = request['process_id']
+reply = requests.post(url, headers=headers, json=payload)
+reply = reply.json()
+pprint(reply, compact=True)
+process_id = reply['process_id']
+print(f'process id: {process_id}')
 response = {}
 url = "https://api.monsterapi.ai/apis/task-status"
+payload = {"process_id": process_id}
+print(f'waiting picture ', end='')
 
 while response.get('response_data') is None or response["response_data"]["status"] != 'COMPLETED':
-    print(f'waiting data ...')
+    print('.', end='')
     time.sleep(1)
-    payload = {"process_id": process_id}
 
     r = requests.post(url, headers=headers, json=payload)
     response = r.json()
-    pprint(response)
+
+pprint(response, compact=True)
