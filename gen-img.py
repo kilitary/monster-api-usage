@@ -1,15 +1,7 @@
-#  √ Copyright (c) 2024 | Axis9 (Umbrella corp. experimental division grouping style)  Right s: res e rv ed
-#  √ kilitary@gmail.com  | deconf@ya.ru | https://twitter.com/CommandmentTwo | https://vk.com/agent1348
-#  √ bus: https://linktr.ee/kilitary
-#  √ mode: Active Counter-TIe
-#  √ Unles s required by applicable law or agreed to in writing, software,
-#  √ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied will be "faced" this rule S.
+#  Copyright (c) 2024/Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
 #
 #
-#
-#
-#
-#
+
 import requests
 import json
 import random
@@ -21,19 +13,21 @@ from pprint import pprint
 payload = {
     "model": "txt2img",
     "data": {
-        "prompt": "frequency objects",
+        "prompt":"multiple  unstable wires near massive black hole , only three objects loading and no  out or waves around  from self",
         "negprompt": "lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll",
         "samples": 1,
-        "steps": 100,
-        "aspect_ratio": "landscape",
-        "guidance_scale": 35
+        "steps": 500,
+        "aspect_ratio": "portrait",
+        "guidance_scale": 32.5,
+        "seed": os.getpid()
     }
 }
 
 headers = {
-    'x-api-key': '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i',
-    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg"
-                     "5OTk5NSwic3ViIjoiNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
+    'x-api-key': 'PPlTUPyMiqakafycyHAPB9SmjX1mGVb4OTErRdS7',
+    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE2NjQ2NTYsImlhdCI6MT"
+                     "Y4OTA3MjY1Niwic3ViIjoiMTBhZjU0MWVmYmZhNGZkMTE4ZjNiNmFmMzVhN2UxZjAifQ.Lbm38b1oa"
+                     "zO9buVxr-nXjqIEL0jVmquMZDEZkUyOtjI"
 }
 
 url = "https://api.monsterapi.ai/apis/add-task"
