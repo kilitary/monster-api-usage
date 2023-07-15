@@ -5,12 +5,12 @@ import random
 import urllib
 import urllib.request as urllib2
 from pprint import pprint
-
 import requests
 import sys
 import time
 from wand.display import display
 from wand.image import Image
+from monsterconfig import API_BEARER, API_KEY, PROMPT, NEGPROMPT
 
 logging.basicConfig(
     filename='monsterapi-img.log',
@@ -18,21 +18,18 @@ logging.basicConfig(
     format='%(asctime)s|%(levelname)s|%(message)s'
 )
 
-API_KEY = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
-API_BEARER = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
-             "iNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
-PROMPT = " picture of unlimited self on the background wnile frequencies operating in you" \
-    # "yourself on the background, " \
-# "high quality, two wires out via 4d axies"
 SEED = time.time_ns()
 random.seed(SEED)
-GUIDANCE = 45
-STEPS = 250
+GUIDANCE = 19
+STEPS = 145
 SAMPLES = 1
+ASPECT = "landscape"
 
 
 def get_image(prompt):
+    prompt = prompt.strip(", \t\r\n~!@#$%^&*()_+=-`}{][|\":;\\?/")
     print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
+    # print(f'bearer: {API_BEARER}')
     print(f'prompt: [{prompt.strip()}]')
 
     # Prompt and payload
@@ -40,10 +37,10 @@ def get_image(prompt):
         "model": "txt2img",
         "data": {
             "prompt": prompt,
-            "negprompt": "collage, tables, rows, columns, lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll, charts",
+            "negprompt": NEGPROMPT,
             "samples": SAMPLES,
             "steps": STEPS,
-            "aspect_ratio": "landscape",
+            "aspect_ratio": ASPECT,
             "guidance_scale": GUIDANCE,
             "seed": SEED
         }
@@ -70,7 +67,7 @@ def get_image(prompt):
     print(f'ID: {process_id}')
     status_response = {}
     status_payload = {"process_id": process_id}
-    what = PROMPT.split(' ')
+    what = prompt.split(' ')
     what = what[random.randint(0, len(what) - 1)].strip(' ,')
     print(f'Waiting {what} ', end='')
     start_time = time.time()
@@ -91,6 +88,7 @@ def get_image(prompt):
 
     delta = int(time.time() - start_time)
     print(f' √ in {delta} secs')
+    credits_used = 0
     for image in status_response["response_data"]["result"]["output"]:
         print(f'image: {image}')
         image_file = f'{what}_{time.time_ns()}.png'
@@ -101,11 +99,15 @@ def get_image(prompt):
             with Image(file=image_request) as img:
                 print('size: ', img.size)
                 display(img)
-                img.save(filename=os.path.join('images', image_file))
+                os.makedirs(os.path.join('images', what), exist_ok=True)
+                img.save(filename=os.path.join('images', what, image_file))
         except Exception as e:
             pprint(e)
-
-    credits_used = str(status_response["response_data"]["credit_used"])
+        credits_used += status_response["response_data"]["credit_used"]
+        logging.info(f"what: {what} seed: {SEED} prompt: {prompt} image: {image} "
+                     f"data[{json.dumps(status_response)}]")
     print(f'credits_used: {credits_used}')
-    logging.info(f'what: {what} seed: {SEED} prompt: {PROMPT} image: {image} '
-                 f"credits_used: {credits_used} data[{json.dumps(status_response)}]")
+
+
+if __name__ == "__main__":
+    get_image(PROMPT)
