@@ -1,5 +1,4 @@
-#  Copyright (c) 2024 | Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
-#
+#  Copyright (c) 2024/Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
 from pprint import pprint
 import random
 import requests

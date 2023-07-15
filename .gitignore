@@ -1,5 +1,4 @@
 /.idea/markdown.xml
 /.idea/vcs.xml
-!/monsterapi-img.log
-!/monsterconfig.py
+monsterapi-img.log
 monsterconfig.py
