@@ -21,6 +21,7 @@ logging.basicConfig(
 
 SEED = time.time_ns()
 random.seed(SEED)
+prev_ee = 0
 
 
 def get_image(prompt):
@@ -28,6 +29,7 @@ def get_image(prompt):
     print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
     # print(f'bearer: {API_BEARER}')
     print(f'prompt: [{prompt}]')
+    print(f'cprompt: [{NEGPROMPT}]')
 
     payload = {
         "model": "txt2img",
@@ -63,14 +65,30 @@ def get_image(prompt):
     print(f'ID: {process_id}')
     status_response = {}
     status_payload = {"process_id": process_id}
-    what = prompt.split(' ')
-    what = what[random.randint(0, len(what) - 1)].strip(' ,')
-    print(f'Waiting {what} ', end='')
+    srcwhat = prompt.split(' ')
+    dstwhat = srcwhat[random.randint(0, len(srcwhat) - 1)].strip(' ,')
+    print(f'=> {dstwhat}-', end='')
     start_time = time.time()
-
     while status_response.get('response_data') is None or status_response["response_data"]["status"] != 'COMPLETED':
-        print('.', end='')
+        def get_object_self():
+            global prev_ee
+            object0 = prev_ee
+            while object0 == prev_ee or object0 == "" or object0 is None:
+                object0 = srcwhat[random.randint(0, len(srcwhat) - 1)].strip(' ,')
+            prev_ee = object0
+            return object0
+
+        object0 = get_object_self()
+        print(f'{object0}', end='')
+        if random.randint(0, 54) % 5 == 0:
+            object0 = get_object_self()
+            print(f"\n=> {object0}", end='')
+
+        c = '+' if random.randint(0, 1) == 1 else '-'
+        print(c, end='')
+
         time.sleep(0.5)
+
         try:
             status_request = requests.post(TASK_STATUS_URL, headers=headers, json=status_payload)
             status_request.raise_for_status()  # Raise an exception if the request was unsuccessful
@@ -87,7 +105,7 @@ def get_image(prompt):
     credits_used = 0
     for image in status_response["response_data"]["result"]["output"]:
         print(f'image: {image}')
-        image_file = f'{what}_{time.time_ns()}.png'
+        image_file = f'{dstwhat}_{time.time_ns()}.png'
         print(f'downloading as {image_file} ...')
 
         try:
@@ -95,12 +113,12 @@ def get_image(prompt):
             with Image(file=image_request) as img:
                 print('size: ', img.size)
                 display(img)
-                os.makedirs(os.path.join('images', what), exist_ok=True)
-                img.save(filename=os.path.join('images', what, image_file))
+                os.makedirs(os.path.join('images', dstwhat), exist_ok=True)
+                img.save(filename=os.path.join('images', dstwhat, image_file))
         except Exception as e:
             pprint(e)
         credits_used += status_response["response_data"]["credit_used"]
-        logging.info(f"what: {what} seed: {SEED} prompt: {prompt} image: {image} "
+        logging.info(f"what: {dstwhat} seed: {SEED} prompt: {prompt} image: {image} "
                      f"data[{json.dumps(status_response)}]")
     print(f'credits_used: {credits_used}')
 

@@ -1,0 +1,5 @@
+
+#700-800MHz 1.0W 4G LTE USA i Phone (AT&T & Verizon)  (Two Bands)
+
+ in 2019.
+4G LTE can handle high bandwidth, but it can be affected by interference. So, if you have a strong signal on a specific frequency - 4G LTE can handle that. However, if the signal strength is weak - it may not be able to handle it as well. The 700MHz LTE band is a frequency range that is used by some carriers in the US, but it may not be used by all carriers. It is possible that some carriers may offer 4G LTE service in this band, but it is not guaranteed.
