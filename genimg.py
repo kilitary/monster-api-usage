@@ -26,8 +26,9 @@ prev_object0 = 0
 
 def get_image(prompt):
     prompt = prompt.strip(", \t\r\n~!@#$%^&*()_+=-`}{][|\":;\\?/")
-    print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
-    # print(f'bearer: {API_BEARER}')
+    print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS}')
+    print(f'api_key: {API_KEY}')
+    print(f'bearer: {API_BEARER}')
     print(f'prompt: [{prompt}]')
     print(f'cprompt: [{NEGPROMPT}]')
 
@@ -51,6 +52,7 @@ def get_image(prompt):
         'Authorization': f"Bearer {API_BEARER}"
     }
 
+    response = {}
     try:
         response = requests.post(ADD_TASK_URL, headers=headers, json=payload)
         response.raise_for_status()  # Raise an exception if the request was unsuccessful
@@ -82,9 +84,9 @@ def get_image(prompt):
 
         object0 = get_object_self()
         print(f'{object0} ', end='')
-        if random.randint(0, 54) % 5 == 0:
+        if random.randint(0, 88) % 4 == 0:
             object0 = get_object_self()
-            print(f"\n=> {object0}", end='')
+            print(f"\n=> {object0} ", end='')
 
         # c = '+' if random.randint(0, 1) == 1 else '-'
         # print(c, end='')

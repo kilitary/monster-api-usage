@@ -6,6 +6,7 @@ from pprint import pprint
 import requests
 import time
 from genimg import get_image
+from monsterconfig import API_BEARER, API_KEY, PROMPT, NEGPROMPT, GUIDANCE, STEPS, SAMPLES, ASPECT
 
 tokens_all = "JP 1-02 carrier frequencies 50,005,016 Hz and 50,005,018 Hz;" \
              "700-800MHz 1.0W 4G LTE USA i Phone (AT&T & Verizon)  (Two Bands);" \
@@ -17,8 +18,8 @@ tokens_all = "JP 1-02 carrier frequencies 50,005,016 Hz and 50,005,018 Hz;" \
              "2100-2170MHz 1.0W 3G, UMTS  (Two Bands);" \
              "2500-2700MHz 1.0W 4G WiMAX Sprint  (Two Bands);" \
              "2570-2690MHz 1.0W 4G LTE High  (Two Bands);" \
-             "3G (WCDMA) 2100 – 2170 Мгц;" \
-             "4G LTE: 2320-2690 Мгц;" \
+             "3G (WCDMA) 2100 – 2170 MHz;" \
+             "4G LTE: 2320-2690 MHz;" \
              "5.1-5.9GHz 1.0W WiFi 11.a;" \
              "5G 3400-3600MHz 1.0W 5G LTE;" \
              "5G 3600-3800MHz 1.0W 5G LTE;" \
@@ -45,8 +46,6 @@ tokens_all = "JP 1-02 carrier frequencies 50,005,016 Hz and 50,005,018 Hz;" \
              "PHS    1900 – 1925 mhz;" \
              "WiFi   2400 – 2500 mhz"
 
-API_KEY = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
-API_URL = 'https://api.monsterapi.ai/apis'
 MODEL_NAME = 'falcon-7b-instruct'
 REQUEST_PAYLOAD = {
     "model": MODEL_NAME,
@@ -56,21 +55,24 @@ REQUEST_PAYLOAD = {
         "top_p": 0.7
     }
 }
-
+url = "https://api.monsterapi.ai"
 tokens = tokens_all.split(';')
 random.shuffle(tokens)
-os.truncate('full.txt', 0)
+print(f'api_key: {API_KEY}')
+print(f'bearer: {API_BEARER}')
+try:
+    os.truncate('full.log', 0)
+except Exception as e:
+    pass
 headers = {
     'x-api-key': API_KEY,
-    'Authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlh"
-                     "dCI6MTY4ODg5OTk5NSwic3ViIjoiNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQ"
-                     "ifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
+    'Authorization': f"Bearer {API_BEARER}"
 }
 
 for token in tokens:
     REQUEST_PAYLOAD["data"]["prompt"] = f"what criminal can do with {token}"
 
-    response = requests.post(f"{API_URL}/add-task", headers=headers, json=REQUEST_PAYLOAD)
+    response = requests.post(f"{url}/apis/add-task", headers=headers, json=REQUEST_PAYLOAD)
     resp = response.json()
     process_id = resp.get('process_id')
     if process_id is None:
@@ -81,15 +83,15 @@ for token in tokens:
     while True:
         time.sleep(1)
         payload = {"process_id": process_id}
-        response = requests.post(f"{API_URL}/task-status", headers=headers, json=payload)
+        response = requests.post(f"{url}/apis/task-status", headers=headers, json=payload)
         response_data = response.json()["response_data"]
 
         if response_data["status"] == 'COMPLETED':
             text = response_data["result"]["text"]
             print(f'reply: {text}')
 
-            content = f"\r\n#{token}\r\n\r\n{text}"
-            with open('full.txt', 'at') as f:
+            content = f"\r\n=> # {token} #\r\n\r\n{text}"
+            with open('full.log', 'at') as f:
                 f.write(content)
 
             get_image(text)
