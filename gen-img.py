@@ -21,13 +21,13 @@ logging.basicConfig(
 api_key = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
 api_bearer = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
              "iNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
-prompt = "corner of universe cracked by massive black hole, " \
-         "self on the background, " \
-         "high quality, two wires out"
+prompt = " image of different frequencys operated by you" \
+    # "yourself on the background, " \
+# "high quality, two wires out via 4d axies"
 seed = time.time_ns()
 random.seed(seed)
-guidance = 15.5
-steps = 33
+guidance = 35.5
+steps = 233
 
 print(f'seed: {seed}')
 print(f'guidance: {guidance}')
@@ -77,7 +77,7 @@ sec_start = time.time()
 
 while response.get('response_data') is None or response["response_data"]["status"] != 'COMPLETED':
     print('.', end='')
-    time.sleep(0.5)
+    time.sleep(0.005)
     try:
         r = requests.post(task_status_url, headers=headers, json=payload)
         r.raise_for_status()  # Raise an exception if the request was unsuccessful
