@@ -51,8 +51,8 @@ REQUEST_PAYLOAD = {
     "model": MODEL_NAME,
     "data": {
         "prompt": "",
-        "top_k": 10,
-        "top_p": 0.7
+        "top_k": 2,
+        "top_p": 0.5
     }
 }
 url = "https://api.monsterapi.ai"
@@ -69,17 +69,26 @@ headers = {
     'Authorization': f"Bearer {API_BEARER}"
 }
 
-for token in tokens:
-    REQUEST_PAYLOAD["data"]["prompt"] = f"what criminal can do with {token}"
 
-    response = requests.post(f"{url}/apis/add-task", headers=headers, json=REQUEST_PAYLOAD)
+def get_text(rp):
+    response = requests.post(f"{url}/apis/add-task", headers=headers, json=rp)
     resp = response.json()
     process_id = resp.get('process_id')
+    return process_id
+
+
+for token in tokens:
+    token = token.strip(", \t\r\n~!@#$%^&*()_+=-`}{][|\":;\\?/")
+    REQUEST_PAYLOAD["data"][
+        "prompt"] = f"what steps should i do to not prevent false counter-terrorists use {token} against me, was this happen in past"
+
+    process_id = get_text(REQUEST_PAYLOAD)
+
     if process_id is None:
         pprint(resp)
         sys.exit()
 
-    print(f'waiting data for [{token}] ...')
+    print(f'waiting data for [' + REQUEST_PAYLOAD["data"]["prompt"] + '] ...')
     while True:
         time.sleep(1)
         payload = {"process_id": process_id}
@@ -89,6 +98,18 @@ for token in tokens:
         if response_data["status"] == 'COMPLETED':
             text = response_data["result"]["text"]
             print(f'reply: {text}')
+
+            if ("As an AI language model" in text and "However" not in text) \
+                    or "Can you please clarify" in text:
+                print(f'! failed to query, trying another morphed ...')
+                text = REQUEST_PAYLOAD["data"]["prompt"]
+                tks = text.split(' ')
+                random.shuffle(tks, random=lambda x: 0.0 if random.randint(0, 2) == 1 else 1.0)
+                text = " ".join(tks)
+                print(f'morphed: [{text}]')
+                REQUEST_PAYLOAD["data"]["prompt"] = text
+                process_id = get_text(REQUEST_PAYLOAD)
+                continue
 
             content = f"\r\n=> # {token} #\r\n\r\n{text}"
             with open('full.log', 'at') as f:
