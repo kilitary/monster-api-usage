@@ -13,25 +13,23 @@ import time
 from wand.display import display
 from wand.image import Image
 
-# Configure logging
 logging.basicConfig(
     filename='monsterapi-img.log',
     level=logging.INFO,
     format='%(asctime)s|%(levelname)s|%(message)s'
 )
-# API credentials
 api_key = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
 api_bearer = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
              "iNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
-prompt = "broken by high gravity dissapeared black holes, " \
-         "with you on background," \
-         "high quality, jitter entering out"
-pid = os.getpid()
-random.seed(pid)
-guidance = 45.5
-steps = 421
+prompt = "corner of universe cracked by massive black hole, " \
+         "self on the background, " \
+         "high quality, two wires out"
+seed = time.time_ns()
+random.seed(seed)
+guidance = 15.5
+steps = 33
 
-print(f'seed: {pid}')
+print(f'seed: {seed}')
 print(f'guidance: {guidance}')
 print(f'steps: {steps}')
 print(f'api_key: {api_key}')
@@ -45,9 +43,9 @@ payload = {
         "negprompt": "lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll",
         "samples": 1,
         "steps": steps,
-        "aspect_ratio": "portrait",
+        "aspect_ratio": "landscape",
         "guidance_scale": guidance,
-        "seed": pid
+        "seed": seed
     }
 }
 
@@ -73,7 +71,7 @@ print(f'Process ID: {process_id}')
 response = {}
 payload = {"process_id": process_id}
 what = prompt.split(' ')
-what = what[random.randint(0, len(what) - 1)].strip(',')
+what = what[random.randint(0, len(what) - 1)].strip(' ,')
 print(f'Waiting {what} ', end='')
 sec_start = time.time()
 
@@ -96,9 +94,8 @@ print(f' in {delta} secs')
 # print(f'{type(response)} {response}')
 image = response["response_data"]["result"]["output"][0]
 print(f'image: {image}')
-print('downloading ...')
-# image_data = requests.get(image)
 image_file = f'{what}_{time.time()}.png'
+print(f'downloading as {image_file} ...')
 
 try:
     re = urllib.request.urlopen(image)
@@ -110,6 +107,6 @@ except Exception as e:
     pprint(e)
 
 credits_used = str(response["response_data"]["credit_used"])
-print(f'credits used: {credits_used}')
+print(f'credits_used: {credits_used}')
 logging.info(
-    f'what: {what} seed: {pid} prompt: {prompt} image: {image} credits_used: {credits_used} data[{json.dumps(response)}]')
+    f'what: {what} seed: {seed} prompt: {prompt} image: {image} credits_used: {credits_used} data[{json.dumps(response)}]')
