@@ -21,7 +21,7 @@ logging.basicConfig(
 API_KEY = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
 API_BEARER = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
              "iNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
-PROMPT = " report of different frequencies operating near you" \
+PROMPT = " image of unlimited self on the background wnile frequencies operating on you" \
     # "yourself on the background, " \
 # "high quality, two wires out via 4d axies"
 SEED = time.time_ns()
@@ -31,14 +31,14 @@ STEPS = 250
 SAMPLES = 1
 
 print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
-print(f'prompt: {PROMPT}')
+print(f'prompt: [{PROMPT.strip()}]')
 
 # Prompt and payload
-PAYLOAD = {
+payload = {
     "model": "txt2img",
     "data": {
         "prompt": PROMPT,
-        "negprompt": "tables, rows, columns, lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll, charts",
+        "negprompt": "collage, tables, rows, columns, lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll, charts",
         "samples": SAMPLES,
         "steps": STEPS,
         "aspect_ratio": "landscape",
@@ -49,13 +49,13 @@ PAYLOAD = {
 
 ADD_TASK_URL = "https://api.monsterapi.ai/apis/add-task"
 TASK_STATUS_URL = "https://api.monsterapi.ai/apis/task-status"
-HEADERS = {
+headers = {
     'x-api-key': API_KEY,
     'Authorization': f"Bearer {API_BEARER}"
 }
 
 try:
-    response = requests.post(ADD_TASK_URL, headers=HEADERS, json=PAYLOAD)
+    response = requests.post(ADD_TASK_URL, headers=headers, json=payload)
     response.raise_for_status()  # Raise an exception if the request was unsuccessful
     process_id = response.json().get('process_id')
 except requests.exceptions.RequestException as e:
@@ -75,9 +75,9 @@ start_time = time.time()
 
 while status_response.get('response_data') is None or status_response["response_data"]["status"] != 'COMPLETED':
     print('.', end='')
-    time.sleep(0.005)
+    time.sleep(0.5)
     try:
-        status_request = requests.post(TASK_STATUS_URL, headers=HEADERS, json=status_payload)
+        status_request = requests.post(TASK_STATUS_URL, headers=headers, json=status_payload)
         status_request.raise_for_status()  # Raise an exception if the request was unsuccessful
         status_response = status_request.json()
         if status_response["response_data"]["status"] == "FAILED":
