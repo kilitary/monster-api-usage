@@ -1,4 +1,3 @@
-#  Copyright (c) 2024/Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
 import json
 import logging
 import os
@@ -18,95 +17,93 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s|%(levelname)s|%(message)s'
 )
-api_key = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
-api_bearer = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
+
+API_KEY = '5jbyNSSpNV3rIcnXM6jpg8m9IZe33XbVWmwAgI8i'
+API_BEARER = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTE0OTE5OTUsImlhdCI6MTY4ODg5OTk5NSwic3ViIjo" \
              "iNzA1MTUzOTczYzZjYjg0NTlmYjRlODg2YjNmMjcyMTQifQ.MQ8ubkvk58S39wyg26sQ-CHtbuu4_Y-xVgKHe2TUG4s"
-prompt = " image of different frequencys operated by you" \
+PROMPT = " report of different frequencies operating near you" \
     # "yourself on the background, " \
 # "high quality, two wires out via 4d axies"
-seed = time.time_ns()
-random.seed(seed)
-guidance = 35.5
-steps = 233
+SEED = time.time_ns()
+random.seed(SEED)
+GUIDANCE = 15
+STEPS = 250
+SAMPLES = 1
 
-print(f'seed: {seed}')
-print(f'guidance: {guidance}')
-print(f'steps: {steps}')
-print(f'api_key: {api_key}')
-print(f'prompt: {prompt}')
+print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
+print(f'prompt: {PROMPT}')
 
 # Prompt and payload
-payload = {
+PAYLOAD = {
     "model": "txt2img",
     "data": {
-        "prompt": prompt,
-        "negprompt": "lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll",
-        "samples": 1,
-        "steps": steps,
+        "prompt": PROMPT,
+        "negprompt": "tables, rows, columns, lowres, worst quality, low quality, jpeg artifacts, bad quality, memes, body horror, doll like, doll, charts",
+        "samples": SAMPLES,
+        "steps": STEPS,
         "aspect_ratio": "landscape",
-        "guidance_scale": guidance,
-        "seed": seed
+        "guidance_scale": GUIDANCE,
+        "seed": SEED
     }
 }
 
-add_task_url = "https://api.monsterapi.ai/apis/add-task"
-task_status_url = "https://api.monsterapi.ai/apis/task-status"
-headers = {
-    'x-api-key': api_key,
-    'Authorization': f"Bearer {api_bearer}"
+ADD_TASK_URL = "https://api.monsterapi.ai/apis/add-task"
+TASK_STATUS_URL = "https://api.monsterapi.ai/apis/task-status"
+HEADERS = {
+    'x-api-key': API_KEY,
+    'Authorization': f"Bearer {API_BEARER}"
 }
 
 try:
-    reply = requests.post(add_task_url, headers=headers, json=payload)
-    reply.raise_for_status()  # Raise an exception if the request was unsuccessful
-    process_id = reply.json().get('process_id')
+    response = requests.post(ADD_TASK_URL, headers=HEADERS, json=PAYLOAD)
+    response.raise_for_status()  # Raise an exception if the request was unsuccessful
+    process_id = response.json().get('process_id')
 except requests.exceptions.RequestException as e:
     print("Error adding task:", e)
     sys.exit(1)
 if process_id is None:
-    print(f'{reply["message"]}')
+    print(f'{response["message"]}')
     sys.exit(1)
 
-print(f'Process ID: {process_id}')
-response = {}
-payload = {"process_id": process_id}
-what = prompt.split(' ')
+print(f'ID: {process_id}')
+status_response = {}
+status_payload = {"process_id": process_id}
+what = PROMPT.split(' ')
 what = what[random.randint(0, len(what) - 1)].strip(' ,')
 print(f'Waiting {what} ', end='')
-sec_start = time.time()
+start_time = time.time()
 
-while response.get('response_data') is None or response["response_data"]["status"] != 'COMPLETED':
+while status_response.get('response_data') is None or status_response["response_data"]["status"] != 'COMPLETED':
     print('.', end='')
     time.sleep(0.005)
     try:
-        r = requests.post(task_status_url, headers=headers, json=payload)
-        r.raise_for_status()  # Raise an exception if the request was unsuccessful
-        response = r.json()
-        if response["response_data"]["status"] == "FAILED":
-            pprint(response)
+        status_request = requests.post(TASK_STATUS_URL, headers=HEADERS, json=status_payload)
+        status_request.raise_for_status()  # Raise an exception if the request was unsuccessful
+        status_response = status_request.json()
+        if status_response["response_data"]["status"] == "FAILED":
+            pprint(status_response)
+            sys.exit()
     except Exception as e:
         print("\nError checking task status:", e)
-        # pprint(response)
         sys.exit(1)
 
-delta = int(time.time() - sec_start)
-print(f' in {delta} secs')
-# print(f'{type(response)} {response}')
-image = response["response_data"]["result"]["output"][0]
-print(f'image: {image}')
-image_file = f'{what}_{time.time()}.png'
-print(f'downloading as {image_file} ...')
+delta = int(time.time() - start_time)
+print(f' √ in {delta} secs')
+for image in status_response["response_data"]["result"]["output"]:
+    print(f'image: {image}')
+    image_file = f'{what}_{time.time_ns()}.png'
+    print(f'downloading as {image_file} ...')
 
-try:
-    re = urllib.request.urlopen(image)
-    with Image(file=re) as img:
-        print('size: ', img.size)
-        display(img)
-        img.save(filename=os.path.join('images', image_file))
-except Exception as e:
-    pprint(e)
+    try:
+        image_request = urllib.request.urlopen(image)
+        with Image(file=image_request) as img:
+            print('size: ', img.size)
+            display(img)
+            img.save(filename=os.path.join('images', image_file))
+    except Exception as e:
+        pprint(e)
 
-credits_used = str(response["response_data"]["credit_used"])
+credits_used = str(status_response["response_data"]["credit_used"])
 print(f'credits_used: {credits_used}')
-logging.info(
-    f'what: {what} seed: {seed} prompt: {prompt} image: {image} credits_used: {credits_used} data[{json.dumps(response)}]')
+logging.info(f'what: {what} seed: {SEED} prompt: {PROMPT} image: {image} '
+             f"credits_used: {credits_used} data[{json.dumps(status_response)}]")
