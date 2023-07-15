@@ -21,7 +21,7 @@ logging.basicConfig(
 
 SEED = time.time_ns()
 random.seed(SEED)
-prev_ee = 0
+prev_object0 = 0
 
 
 def get_image(prompt):
@@ -57,6 +57,7 @@ def get_image(prompt):
         process_id = response.json().get('process_id')
     except requests.exceptions.RequestException as e:
         print("Error adding task:", e)
+        pprint(response)
         sys.exit(1)
     if process_id is None:
         print(f'{response["message"]}')
@@ -67,27 +68,28 @@ def get_image(prompt):
     status_payload = {"process_id": process_id}
     srcwhat = prompt.split(' ')
     dstwhat = srcwhat[random.randint(0, len(srcwhat) - 1)].strip(' ,')
-    print(f'=> {dstwhat}-', end='')
+    print(f'=> {dstwhat} ', end='')
     start_time = time.time()
     while status_response.get('response_data') is None or status_response["response_data"]["status"] != 'COMPLETED':
+
         def get_object_self():
-            global prev_ee
-            object0 = prev_ee
-            while object0 == prev_ee or object0 == "" or object0 is None:
+            global prev_object0
+            object0 = prev_object0
+            while object0 == prev_object0 or object0 == "" or object0 is None:
                 object0 = srcwhat[random.randint(0, len(srcwhat) - 1)].strip(' ,')
-            prev_ee = object0
+            prev_object0 = object0
             return object0
 
         object0 = get_object_self()
-        print(f'{object0}', end='')
+        print(f'{object0} ', end='')
         if random.randint(0, 54) % 5 == 0:
             object0 = get_object_self()
             print(f"\n=> {object0}", end='')
 
-        c = '+' if random.randint(0, 1) == 1 else '-'
-        print(c, end='')
+        # c = '+' if random.randint(0, 1) == 1 else '-'
+        # print(c, end='')
 
-        time.sleep(0.5)
+        time.sleep(1)
 
         try:
             status_request = requests.post(TASK_STATUS_URL, headers=headers, json=status_payload)
@@ -98,6 +100,7 @@ def get_image(prompt):
                 sys.exit()
         except Exception as e:
             print("\nError checking task status:", e)
+            pprint(status_response)
             sys.exit(1)
 
     delta = int(time.time() - start_time)
