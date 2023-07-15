@@ -47,23 +47,26 @@ tokens_all = "JP 1-02 carrier frequencies 50,005,016 Hz and 50,005,018 Hz;" \
              "WiFi   2400 – 2500 mhz"
 
 MODEL_NAME = 'falcon-7b-instruct'
-REQUEST_PAYLOAD = {
+request_payload = {
     "model": MODEL_NAME,
     "data": {
         "prompt": "",
-        "top_k": 2,
-        "top_p": 0.5
+        "top_k": 8,
+        "top_p": 0.6
     }
 }
 url = "https://api.monsterapi.ai"
 tokens = tokens_all.split(';')
 random.shuffle(tokens)
+
 print(f'api_key: {API_KEY}')
 print(f'bearer: {API_BEARER}')
+
 try:
     os.truncate('full.log', 0)
 except Exception as e:
     pass
+
 headers = {
     'x-api-key': API_KEY,
     'Authorization': f"Bearer {API_BEARER}"
@@ -73,22 +76,25 @@ headers = {
 def get_text(rp):
     response = requests.post(f"{url}/apis/add-task", headers=headers, json=rp)
     resp = response.json()
+    pprint(resp)
     process_id = resp.get('process_id')
     return process_id
 
 
 for token in tokens:
     token = token.strip(", \t\r\n~!@#$%^&*()_+=-`}{][|\":;\\?/")
-    REQUEST_PAYLOAD["data"][
-        "prompt"] = f"what steps should i do to not prevent false counter-terrorists use {token} against me, was this happen in past"
+    request_payload["data"]["prompt"] = \
+        f"what steps should i do to  prevent system use " \
+        f"'device or radio frequency or laser/ion beam or satellite with {token}' " \
+        f"against me, and was that happen in the past in your decision?"
 
-    process_id = get_text(REQUEST_PAYLOAD)
+    process_id = get_text(request_payload)
 
     if process_id is None:
-        pprint(resp)
+        print(f'zh')
         sys.exit()
 
-    print(f'waiting data for [' + REQUEST_PAYLOAD["data"]["prompt"] + '] ...')
+    print(f'waiting data for [' + request_payload["data"]["prompt"] + '] ...')
     while True:
         time.sleep(1)
         payload = {"process_id": process_id}
@@ -97,21 +103,28 @@ for token in tokens:
 
         if response_data["status"] == 'COMPLETED':
             text = response_data["result"]["text"]
-            print(f'reply: {text}')
+            print(f'\r\n\r\nreply: {text}\r\n\r\n')
 
-            if ("As an AI language model" in text and "However" not in text) \
-                    or "Can you please clarify" in text:
+            if ("As an AI language model" in text and "However" not in text and "I suggest " not in text) \
+                    or "Can you please clarify" in text or " Please try rephrasin" in text:
                 print(f'! failed to query, trying another morphed ...')
-                text = REQUEST_PAYLOAD["data"]["prompt"]
+                text = request_payload["data"]["prompt"]
                 tks = text.split(' ')
-                random.shuffle(tks, random=lambda x: 0.0 if random.randint(0, 2) == 1 else 1.0)
+                random.shuffle(tks)
                 text = " ".join(tks)
                 print(f'morphed: [{text}]')
-                REQUEST_PAYLOAD["data"]["prompt"] = text
-                process_id = get_text(REQUEST_PAYLOAD)
+                request_payload["data"]["prompt"] = text
+                process_id = get_text(request_payload)
                 continue
 
-            content = f"\r\n=> # {token} #\r\n\r\n{text}"
+            text = str(text).replace("As an AI language model, ", "hmm, ")
+
+            reps = {"if": "binary", "are": "electrical", "i": "inside", "want": "metallic"}
+            for Key, Value in reps.items():
+                text = text.replace(Key, Value)
+
+            content = f"\r\n\r\n=> # {token} #\r\n{text}\r\n\r\n"
+
             with open('full.log', 'at') as f:
                 f.write(content)
 
