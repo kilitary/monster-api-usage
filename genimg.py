@@ -1,3 +1,4 @@
+#  Copyright (c) 2024/Axis9 (Umbrella corp. experimental division grouping style) | kilitry@gmail.com | https://linktr.ee/kilitary
 import json
 import logging
 import os
@@ -10,7 +11,7 @@ import sys
 import time
 from wand.display import display
 from wand.image import Image
-from monsterconfig import API_BEARER, API_KEY, PROMPT, NEGPROMPT
+from monsterconfig import API_BEARER, API_KEY, PROMPT, NEGPROMPT, GUIDANCE, STEPS, SAMPLES, ASPECT
 
 logging.basicConfig(
     filename='monsterapi-img.log',
@@ -20,19 +21,14 @@ logging.basicConfig(
 
 SEED = time.time_ns()
 random.seed(SEED)
-GUIDANCE = 19
-STEPS = 145
-SAMPLES = 1
-ASPECT = "landscape"
 
 
 def get_image(prompt):
     prompt = prompt.strip(", \t\r\n~!@#$%^&*()_+=-`}{][|\":;\\?/")
     print(f'samples={SAMPLES} seed={SEED} guidance={GUIDANCE} steps={STEPS} api_key={API_KEY}')
     # print(f'bearer: {API_BEARER}')
-    print(f'prompt: [{prompt.strip()}]')
+    print(f'prompt: [{prompt}]')
 
-    # Prompt and payload
     payload = {
         "model": "txt2img",
         "data": {
